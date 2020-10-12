@@ -117,6 +117,7 @@ static int32_t G_cal[g_num];
 static int32_t max_G;
 static uint32_t max_G_loc;
 static int32_t step;
+static uint8_t bpm_val;
 static int i;
 
 int32_t pn_npks_s;                           
@@ -190,9 +191,9 @@ int main(void)
 	HAL_Delay(10);
 	while(Set_ADS1292_Collect(0))//0 正常采集  //1 1mV1Hz内部侧试信号 //2 内部短接噪声测试
 		{	
-				printf("1292寄存器设置失败\r\n");
+				//printf("1292寄存器设置失败\r\n");
 		}	
-		printf("寄存器设置成功\r\n");
+		//printf("寄存器设置成功\r\n");
 	
 	MPU_Init();
 		
@@ -223,8 +224,8 @@ int main(void)
 		//printf("%f\n\r",G*10);
 		if(temp_ad_send_flag == 1)
 		{
-			printf("x0.val=%d",real_temp);
-			send_ending_flag();
+			//printf("x0.val=%d",real_temp);
+			//send_ending_flag();
 			temp_ad_send_flag=0;
 		}
 		if(i == g_num)
@@ -243,8 +244,8 @@ int main(void)
 			}
 			
 		}
-		printf("n1.val=%d",step);
-		send_ending_flag();
+		//printf("n1.val=%d",step);
+		//send_ending_flag();
     /* USER CODE END WHILE */
 		if(ads1292_recive_flag)
 		{										
@@ -297,12 +298,14 @@ int main(void)
 								maxim_peaks_above_min_height(pn_locs,&pn_npks,bpm_cache,1000,145);                   //寻找175以上的峰
 								bpm = bpm_calculate(pn_locs,pn_npks);
 								//bpm = 60.0/(pn_locs[pn_npks-1]-pn_locs[pn_npks-2])*204;                              //计算心率 算法:两峰之间点数*采样率
-								printf("n0.val=%d",(int)bpm);                                                        //输出心率数据
-								send_ending_flag();
+								//printf("n0.val=%d",(int)bpm);                                                        //输出心率数据
+								//send_ending_flag();
 								
 								}
-								printf("add 2,0,%0.f",fir_put[0]-mid_val+100);
-								send_ending_flag();
+								//printf("add 2,0,%0.f",fir_put[0]-mid_val+100);
+								bpm_val = fir_put[0]-mid_val+100;
+								HAL_UART_Transmit(&huart1,&bpm_val,1,0xFFFF);
+								//send_ending_flag();
 								arm_copy_f32(mid_filt_cache1,mid_filt_cache,midfilt_num);
 							}
 						   
