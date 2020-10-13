@@ -162,9 +162,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>307</LineNumber>
+          <LineNumber>312</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134239488</Address>
+          <Address>134239930</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -173,7 +173,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../Src/main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\AD1292\../Src/main.c\307</Expression>
+          <Expression>\\AD1292\../Src/main.c\312</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -327,6 +327,41 @@
           <WinNumber>1</WinNumber>
           <ItemText>real_temp</ItemText>
         </Ww>
+        <Ww>
+          <count>30</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>bpm_val</ItemText>
+        </Ww>
+        <Ww>
+          <count>31</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>wifi_bpm_val</ItemText>
+        </Ww>
+        <Ww>
+          <count>32</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>warning_flag</ItemText>
+        </Ww>
+        <Ww>
+          <count>33</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pn_npks</ItemText>
+        </Ww>
+        <Ww>
+          <count>34</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pn_locs</ItemText>
+        </Ww>
+        <Ww>
+          <count>35</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>bpm</ItemText>
+        </Ww>
+        <Ww>
+          <count>36</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>int_wifi_bpm_val</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -478,6 +513,11 @@
           <count>29</count>
           <WinNumber>2</WinNumber>
           <ItemText>n</ItemText>
+        </Ww>
+        <Ww>
+          <count>30</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>bpm_cache</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>

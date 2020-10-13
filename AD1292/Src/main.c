@@ -64,10 +64,18 @@
 
 static int mid_filt_start_flag;
 static int temp_ad_send_flag;
+static int warning_flag;
+
+static int half_send_flag;
+
+uint8_t wifi_bpm_flag = 0x01;
+uint8_t wifi_temp_flag = 0x02;
+uint8_t wifi_step_flag = 0x03;
 
 static int32_t value;
 float32_t temp_ad;
 int real_temp;
+uint8_t wifi_real_temp;
 static float32_t sum;
 float32_t a=-1.809628E-09;
 float32_t b=-3.325395E-06;
@@ -86,7 +94,7 @@ float32_t fir_put1[36];                     //滤波输出数据
 float32_t breath_cache[36];                //呼吸滤波缓存
 int32_t breath_calculate_cache[250];    //呼吸计算缓存
 int32_t val1_int;                          //心率数据int32格式
-int32_t bpm_cache[1000];                   //计算心率的数据缓存
+int32_t bpm_cache[1300];                   //计算心率的数据缓存
 float32_t mid_filt_cache[midfilt_num];             //中值滤波缓存
 float32_t mid_filt_cache1[midfilt_num];             //中值滤波缓存
 
@@ -116,8 +124,11 @@ static float32_t faacz;
 static int32_t G_cal[g_num];
 static int32_t max_G;
 static uint32_t max_G_loc;
-static int32_t step;
+static int8_t step;
+static uint8_t wifi_step;
 static uint8_t bpm_val;
+static int8_t int_wifi_bpm_val;
+static uint8_t wifi_bpm_val;
 static int i;
 
 int32_t pn_npks_s;                           
@@ -244,8 +255,9 @@ int main(void)
 			}
 			
 		}
-		//printf("n1.val=%d",step);
-		//send_ending_flag();
+		wifi_step = step;
+		//HAL_UART_Transmit(&huart1,&wifi_step_flag,1,0xFFFF);
+		//HAL_UART_Transmit(&huart1,&wifi_step,1,0xFFFF);
     /* USER CODE END WHILE */
 		if(ads1292_recive_flag)
 		{										
@@ -292,13 +304,25 @@ int main(void)
 										
 							bpm_cache[n] = (fir_put[0]-mid_val+100);
 							n++;
-							if(n>1000)
+							if(n>1300)
 							{
 								n=0;
-								maxim_peaks_above_min_height(pn_locs,&pn_npks,bpm_cache,1000,145);                   //寻找175以上的峰
+								maxim_peaks_above_min_height(pn_locs,&pn_npks,bpm_cache,1300,135);                   //寻找175以上的峰
 								bpm = bpm_calculate(pn_locs,pn_npks);
+								warning_flag = find_bad_bpm(pn_locs,pn_npks);
+								int_wifi_bpm_val = (int)bpm;
+								wifi_bpm_val = int_wifi_bpm_val;
 								//bpm = 60.0/(pn_locs[pn_npks-1]-pn_locs[pn_npks-2])*204;                              //计算心率 算法:两峰之间点数*采样率
-								//printf("n0.val=%d",(int)bpm);                                                        //输出心率数据
+								if(half_send_flag == 0)
+								{
+									HAL_UART_Transmit(&huart1,&wifi_bpm_flag,1,0xFFFF);
+									HAL_UART_Transmit(&huart1,&wifi_bpm_val,1,0xFFFF);
+									half_send_flag = 1;
+								}
+								else
+									half_send_flag = 0;
+								//printf("n0.val=%d",(int)bpm); 
+								//输出心率数据
 								//send_ending_flag();
 								
 								}
@@ -405,7 +429,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			else if(j==3)
 			{
 				j = 0;
-				real_temp = sum*10 / 3;
+				real_temp = sum / 3;
+				wifi_real_temp = real_temp;
+				HAL_UART_Transmit(&huart1,&wifi_temp_flag,1,0xFFFF);
+				HAL_UART_Transmit(&huart1,&wifi_real_temp,1,0xFFFF);
+				delay_us(2);
+				HAL_UART_Transmit(&huart1,&wifi_step_flag,1,0xFFFF);
+				HAL_UART_Transmit(&huart1,&wifi_step,1,0xFFFF);
 				//printf("x0.val=%d",(int)(sum*10));
 				//send_ending_flag();
 				temp_ad_send_flag = 1;

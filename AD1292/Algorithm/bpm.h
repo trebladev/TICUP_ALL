@@ -19,6 +19,9 @@
 
 int32_t bpm_calculate(int32_t *location,int32_t size);
 
+int8_t find_bad_bpm(int32_t *location,int32_t size);
+
+int8_t two_num(int32_t num1,int32_t num2);
 
 #endif //__bpm_H
 

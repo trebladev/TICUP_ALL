@@ -349,7 +349,7 @@ void ADS1292_val_init(float32_t *data,float32_t *a,float32_t *b)
 
 	*a1 = 180/(max_init_val-min_init_val);
 
-	*b1 = 220-(*a1)*max_init_val;
+	*b1 = 300-(*a1)*max_init_val;
 
 }
 
