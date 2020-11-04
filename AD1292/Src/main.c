@@ -65,6 +65,8 @@
 static int mid_filt_start_flag;
 static int temp_ad_send_flag;
 static int warning_flag;
+static int debug_flag;
+
 
 static int half_send_flag;
 
@@ -227,6 +229,7 @@ int main(void)
   /* USER CODE END 2 */
 	//arm_fir5_init();
 	arm_fir48_init();
+	debug_flag = HAL_GPIO_ReadPin(GPIOF,GPIO_PIN_4);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -243,10 +246,10 @@ int main(void)
 		{
 			i = 0;
 			arm_max_q31(G_cal,g_num,&max_G,&max_G_loc);
-			if(max_G > 2000)
+			if(max_G > 1500)
 			{
 				//maxim_peaks_above_min_height(pn_locs,&pn_npks,G_cal,g_num,0.7*max_G);
-				maxim_find_peaks(pn_locs_s,&pn_npks_s,G_cal,g_num,0.7*max_G,10,100);
+				maxim_find_peaks(pn_locs_s,&pn_npks_s,G_cal,g_num,0.4*max_G,35,100);
 				step = step + pn_npks_s;
 			}
 			else
@@ -315,9 +318,18 @@ int main(void)
 								//bpm = 60.0/(pn_locs[pn_npks-1]-pn_locs[pn_npks-2])*204;                              //计算心率 算法:两峰之间点数*采样率
 								if(half_send_flag == 0)
 								{
-									HAL_UART_Transmit(&huart1,&wifi_bpm_flag,1,0xFFFF);
-									HAL_UART_Transmit(&huart1,&wifi_bpm_val,1,0xFFFF);
-									half_send_flag = 1;
+									if(debug_flag == 1)
+									{
+										printf("n0.val=%d",(int)bpm);
+										send_ending_flag();
+										half_send_flag = 1;
+									}
+								else{
+										HAL_UART_Transmit(&huart1,&wifi_bpm_flag,1,0xFFFF);
+										HAL_UART_Transmit(&huart1,&wifi_bpm_val,1,0xFFFF);
+										half_send_flag = 1;
+									}
+									
 								}
 								else
 									half_send_flag = 0;
@@ -328,7 +340,14 @@ int main(void)
 								}
 								//printf("add 2,0,%0.f",fir_put[0]-mid_val+100);
 								bpm_val = fir_put[0]-mid_val+100;
-								HAL_UART_Transmit(&huart1,&bpm_val,1,0xFFFF);
+								if(debug_flag == 1)
+								{
+									printf("add 9,0,%0.f",fir_put[0]-mid_val+100);
+									send_ending_flag();
+								}
+								else{
+									HAL_UART_Transmit(&huart1,&bpm_val,1,0xFFFF);
+								}
 								//send_ending_flag();
 								arm_copy_f32(mid_filt_cache1,mid_filt_cache,midfilt_num);
 							}
@@ -431,11 +450,29 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				j = 0;
 				real_temp = sum / 3;
 				wifi_real_temp = real_temp;
-				HAL_UART_Transmit(&huart1,&wifi_temp_flag,1,0xFFFF);
-				HAL_UART_Transmit(&huart1,&wifi_real_temp,1,0xFFFF);
+				if(debug_flag == 1)
+				{
+					printf("x0.val=%d",(int)(sum*10/3));
+					send_ending_flag();
+				}
+				else
+				{
+					HAL_UART_Transmit(&huart1,&wifi_temp_flag,1,0xFFFF);
+					HAL_UART_Transmit(&huart1,&wifi_real_temp,1,0xFFFF);
+				}
+				
 				delay_us(2);
-				HAL_UART_Transmit(&huart1,&wifi_step_flag,1,0xFFFF);
-				HAL_UART_Transmit(&huart1,&wifi_step,1,0xFFFF);
+				if(debug_flag == 1)
+				{
+					printf("n2.val=%d",step);
+					send_ending_flag();
+				}
+				else
+				{
+					HAL_UART_Transmit(&huart1,&wifi_step_flag,1,0xFFFF);
+					HAL_UART_Transmit(&huart1,&wifi_step,1,0xFFFF);
+				}
+				
 				//printf("x0.val=%d",(int)(sum*10));
 				//send_ending_flag();
 				temp_ad_send_flag = 1;

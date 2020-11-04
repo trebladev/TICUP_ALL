@@ -63,7 +63,7 @@ int32_t bpm_calculate(int32_t *loc,int32_t size)
 
 int8_t find_bad_bpm(int32_t *loc,int32_t size)
 {
-	int32_t num,bpm;
+	int32_t num;
 	num = size;
 	int i;
 
